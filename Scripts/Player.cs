@@ -1,10 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using UnityEditor;
 
 public class Player : MonoBehaviour
 {
-    public float sped; // Убедитесь, что это ваша скорость
+    public float speed; // Убедитесь, что это ваша скорость
+    public float speedBonus;
     public float jumpforce;
+
+    private float speedStart;
 
     private bool isGrounded;
     private Rigidbody2D rigidbody2d;
@@ -14,12 +19,21 @@ public class Player : MonoBehaviour
     public int score;
     public Text scoreText;
 
+    public float timerSpeed;
+    public float timerSpeedMax;
+
+    public float timerScale;
+    public float timerScaleMax;
+
+
 
     private void Start()
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+
+        speedStart = speed;
     }
 
     void FixedUpdate()
@@ -31,7 +45,7 @@ public class Player : MonoBehaviour
 
         // Перемещение игрока
         Vector3 position = transform.position;
-        position.x += Input.GetAxis("Horizontal") * sped * Time.fixedDeltaTime; // Умножьте на скорость
+        position.x += Input.GetAxis("Horizontal") * speed * Time.fixedDeltaTime; // Умножьте на скорость
         transform.position = position;
 
        
@@ -54,6 +68,53 @@ public class Player : MonoBehaviour
         {
             animator.SetInteger("State", 0);
         }
+
+       
+        BonusCheck();
+    }
+
+    private void BonusCheck()
+    {
+        if (timerSpeed > 0)
+        {
+            speed = speedBonus;
+            timerSpeed--;
+        }
+        else
+        {
+            speed = speedStart;
+        }
+
+
+        if (timerScale > 0)
+        {
+            transform.localScale = new Vector3(1.5f, 1.5f, 1);
+            timerScale--;
+        }
+        else
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+            speed = speedStart;
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape)) 
+        {
+            SceneManager.LoadScene(0);
+            Debug.Log("esc");
+        }
+    }
+
+    public void BonusScale()
+    {
+        timerScale = timerScaleMax;
+    }
+
+    public void SpeedBonus()
+    {
+        timerSpeed = timerSpeedMax;
     }
 
     public void AddCoid(int count)
